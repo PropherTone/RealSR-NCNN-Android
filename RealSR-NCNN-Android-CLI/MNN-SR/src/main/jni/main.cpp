@@ -94,7 +94,7 @@ static std::vector<int> parse_optarg_int_array(const wchar_t* optarg)
 #include <unistd.h> // getopt()
 
 
-#include <cstring> 
+#include <cstring>
 
 static std::vector<int> parse_optarg_int_array(const char *optarg) {
     std::vector<int> array;
@@ -277,10 +277,10 @@ void *load(void *args) {
 
             // 判断 alpha 通道是否为单一颜色
             if (countNonZero(alphaChannel != alphaChannel.at<uchar>(0, 0)) == 0) {
-                #if _WIN32  
-                           fwprintf(stderr, L"ignore alpha channel, %ls\n", imagepath.c_str());  
-                #else  
-                           fprintf(stderr, "ignore alpha channel, %s\n", imagepath.c_str());  
+                #if _WIN32
+                           fwprintf(stderr, L"ignore alpha channel, %ls\n", imagepath.c_str());
+                #else
+                           fprintf(stderr, "ignore alpha channel, %s\n", imagepath.c_str());
                 #endif
                 c = 3;
             } else {
@@ -291,9 +291,9 @@ void *load(void *args) {
         } else if (c == 3) {
             v.inimage = image;
         } else {
-#if _WIN32  
+#if _WIN32
             fwprintf(stderr, L"[err] channel=%d, %ls\n", image.channels(), imagepath.c_str());
-#else  
+#else
             fprintf(stderr, "[err] channel=%d, %s\n", image.channels(), imagepath.c_str());
 #endif
 
@@ -368,7 +368,7 @@ public:
     int input_files_size;
 };
 
- 
+
 
 void *save(void *args) {
     const SaveThreadParams *stp = (const SaveThreadParams *) args;
@@ -383,9 +383,9 @@ void *save(void *args) {
             break;
 
         if (v.outimage.empty()) {
-#if _WIN32  
+#if _WIN32
             fwprintf(stderr, L"[err] invalid result %ls\n", v.inpath.c_str());
-#else  
+#else
             fprintf(stderr, "[err] invalid result %s\n", v.inpath.c_str());
 #endif
             continue;
@@ -467,141 +467,25 @@ const char *optarg_out = "output.png";
 const char *optarg_mo = "models-MNN/ESRGAN-MoeSR-jp_Illustration-x4.mnn";
 #endif
 
-#if _WIN32
-int wmain(int argc, wchar_t** argv)
-#else
-
-int main(int argc, char **argv)
-#endif
+int main_internal(int backend_type,
+                  const path_t& input,
+                  const path_t& output,
+                  int scale,
+                  int tilesize,
+                  int color_type,
+                  int decensor_mode,
+                  const path_t& model,
+                  int jobs_load,
+                  int jobs_save,
+                  int verbose,
+                  path_t format)
 {
-
     high_resolution_clock::time_point prg_start = high_resolution_clock::now();
-    int backend_type = MNN_FORWARD_OPENCL;
     path_t inputpath;
     path_t outputpath;
-    int scale = 4;
-    int tilesize = 0;
-    int color_type = UnSet;
-    int decensor_mode = -1;
-    path_t model = optarg_mo;
-    std::vector<int> gpuid;
-    int jobs_load = 1;
-    std::vector<int> jobs_proc;
-    int jobs_save = 1;
-    int verbose = 0;
-    path_t format = PATHSTR("png");
 
-#if _WIN32
-    setlocale(LC_ALL, "");
-    wchar_t opt;
-    while ((opt = getopt(argc, argv, L"b:i:o:s:c:d:t:m:g:j:f:vxh")) != (wchar_t)-1)
-    {
-        switch (opt)
-        {
-        case L'i':
-            inputpath = optarg;
-            break;
-        case L'o':
-            outputpath = optarg;
-            break;
-        case L's':
-            scale = _wtoi(optarg);
-            break;
-        case L't':
-            tilesize = _wtoi(optarg);
-            break;
-        case L'm':
-            model = optarg;
-            break;
-        case L'g':
-            gpuid = parse_optarg_int_array(optarg);
-            if(gpuid.size()>0 && gpuid[0]==-1){
-                backend_type = MNN_FORWARD_CPU;
-            }
-            break;
-        //case L'j':
-        //    swscanf(optarg, L"%d:%*[^:]:%d", &jobs_load, &jobs_save);
-        //    jobs_proc = parse_optarg_int_array(wcschr(optarg, L':') + 1);
-        //    break;
-        case L'f':
-            format = optarg;
-            break;
-        case L'v':
-            verbose = 1;
-            break;
-        case L'x':
-            break;
-        case 'd':
-            decensor_mode = _wtoi(optarg);
-            break;
-        case L'c':
-            color_type = _wtoi(optarg);
-            break;
-        case L'b':
-            if(backend_type != MNN_FORWARD_CPU)
-                backend_type =_wtoi(optarg);
-            break;
-        case L'h':
-        default:
-            print_usage();
-            return -1;
-        }
-    }
-#else // _WIN32
-    int opt;
-    while ((opt = getopt(argc, argv, "b:i:o:s:c:d:t:m:g:j:f:vxh")) != -1) {
-        switch (opt) {
-            case 'i':
-                inputpath = optarg;
-                break;
-            case 'o':
-                outputpath = optarg;
-                break;
-            case 's':
-                scale = atoi(optarg);
-                break;
-            case 't':
-                tilesize = atoi(optarg);
-                break;
-            case 'm':
-                model = optarg;
-                break;
-            case 'g':
-                gpuid = parse_optarg_int_array(optarg);
-                if (gpuid.size() > 0 && gpuid[0] == -1) {
-                    backend_type = MNN_FORWARD_CPU;
-                }
-                break;
-            //case 'j':
-            //    sscanf(optarg, "%d:%*[^:]:%d", &jobs_load, &jobs_save);
-            //    jobs_proc = parse_optarg_int_array(strchr(optarg, ':') + 1);
-            //    break;
-            case 'f':
-                format = optarg;
-                break;
-            case 'v':
-                verbose = 1;
-                break;
-            case 'x':
-                break;
-            case 'd':
-                decensor_mode = atoi(optarg);
-                break;
-            case 'c':
-                color_type = atoi(optarg);
-                break;
-            case 'b':
-                if (backend_type != MNN_FORWARD_CPU)
-                    backend_type = atoi(optarg);
-                break;
-            case 'h':
-            default:
-                print_usage();
-                return -1;
-        }
-    }
-#endif // _WIN32
-
+    inputpath = input;
+    outputpath = output;
 
     if (inputpath.empty()) {
         print_usage();
@@ -647,10 +531,10 @@ int main(int argc, char **argv)
 			else {
                 fs::create_directories(outputpath);
 				if (!fs::exists(outputpath)) {
-                    #if _WIN32  
-                    fwprintf(stderr, L"[err]create outputpath failed: %ls\n", outputpath.c_str());  
-                    #else  
-                    fprintf(stderr, "[err]create outputpath failed: %s\n", outputpath.c_str());  
+                    #if _WIN32
+                    fwprintf(stderr, L"[err]create outputpath failed: %ls\n", outputpath.c_str());
+                    #else
+                    fprintf(stderr, "[err]create outputpath failed: %s\n", outputpath.c_str());
                     #endif
 					return -1;
 				}
@@ -933,3 +817,187 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+#if _WIN32
+int wmain(int argc, wchar_t** argv)
+#else
+int main(int argc, char **argv)
+#endif
+{
+    int backend_type = MNN_FORWARD_OPENCL;
+    path_t inputpath;
+    path_t outputpath;
+    int scale = 4;
+    int tilesize = 0;
+    int color_type = UnSet;
+    int decensor_mode = -1;
+    path_t model = optarg_mo;
+    std::vector<int> gpuid;
+    int jobs_load = 1;
+    int jobs_save = 1;
+    int verbose = 0;
+    path_t format = PATHSTR("png");
+
+#if _WIN32
+    setlocale(LC_ALL, "");
+    wchar_t opt;
+    while ((opt = getopt(argc, argv, L"b:i:o:s:c:d:t:m:g:j:f:vxh")) != (wchar_t)-1)
+    {
+        switch (opt)
+        {
+        case L'i':
+            inputpath = optarg;
+            break;
+        case L'o':
+            outputpath = optarg;
+            break;
+        case L's':
+            scale = _wtoi(optarg);
+            break;
+        case L't':
+            tilesize = _wtoi(optarg);
+            break;
+        case L'm':
+            model = optarg;
+            break;
+        case L'g':
+            gpuid = parse_optarg_int_array(optarg);
+            if(gpuid.size()>0 && gpuid[0]==-1){
+                backend_type = MNN_FORWARD_CPU;
+            }
+            break;
+        //case L'j':
+        //    swscanf(optarg, L"%d:%*[^:]:%d", &jobs_load, &jobs_save);
+        //    jobs_proc = parse_optarg_int_array(wcschr(optarg, L':') + 1);
+        //    break;
+        case L'f':
+            format = optarg;
+            break;
+        case L'v':
+            verbose = 1;
+            break;
+        case L'x':
+            break;
+        case 'd':
+            decensor_mode = _wtoi(optarg);
+            break;
+        case L'c':
+            color_type = _wtoi(optarg);
+            break;
+        case L'b':
+            if(backend_type != MNN_FORWARD_CPU)
+                backend_type =_wtoi(optarg);
+            break;
+        case L'h':
+        default:
+            print_usage();
+            return -1;
+        }
+    }
+#else // _WIN32
+    int opt;
+    while ((opt = getopt(argc, argv, "b:i:o:s:c:d:t:m:g:j:f:vxh")) != -1) {
+        switch (opt) {
+            case 'i':
+                inputpath = optarg;
+                break;
+            case 'o':
+                outputpath = optarg;
+                break;
+            case 's':
+                scale = atoi(optarg);
+                break;
+            case 't':
+                tilesize = atoi(optarg);
+                break;
+            case 'm':
+                model = optarg;
+                break;
+            case 'g':
+                gpuid = parse_optarg_int_array(optarg);
+                if (gpuid.size() > 0 && gpuid[0] == -1) {
+                    backend_type = MNN_FORWARD_CPU;
+                }
+                break;
+                //case 'j':
+                //    sscanf(optarg, "%d:%*[^:]:%d", &jobs_load, &jobs_save);
+                //    jobs_proc = parse_optarg_int_array(strchr(optarg, ':') + 1);
+                //    break;
+            case 'f':
+                format = optarg;
+                break;
+            case 'v':
+                verbose = 1;
+                break;
+            case 'x':
+                break;
+            case 'd':
+                decensor_mode = atoi(optarg);
+                break;
+            case 'c':
+                color_type = atoi(optarg);
+                break;
+            case 'b':
+                if (backend_type != MNN_FORWARD_CPU)
+                    backend_type = atoi(optarg);
+                break;
+            case 'h':
+            default:
+                print_usage();
+                return -1;
+        }
+    }
+#endif // _WIN32
+
+    return main_internal(backend_type, inputpath, outputpath, scale, tilesize, color_type, decensor_mode, model, jobs_load, jobs_save, verbose, format);
+}
+
+#ifdef __ANDROID__
+#include <jni.h>
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_mnn_realsr_MnnSrNative_run(JNIEnv* env, jobject thiz,
+                                             jstring input_path,
+                                             jstring output_path,
+                                             jint scale,
+                                             jint tilesize,
+                                             jstring model_path,
+                                             jintArray gpu_ids,
+                                             jint jobs_load,
+                                             jint jobs_save,
+                                             jint verbose,
+                                             jstring format,
+                                             jint backend,
+                                             jint color_type,
+                                             jint decensor_mode) {
+    const char* in_c = input_path ? env->GetStringUTFChars(input_path, nullptr) : nullptr;
+    const char* out_c = output_path ? env->GetStringUTFChars(output_path, nullptr) : nullptr;
+    const char* model_c = model_path ? env->GetStringUTFChars(model_path, nullptr) : nullptr;
+    const char* fmt_c = format ? env->GetStringUTFChars(format, nullptr) : "png";
+
+    path_t in_p  = in_c   ? path_t(in_c)   : path_t();
+    path_t out_p = out_c  ? path_t(out_c)  : path_t();
+    path_t mo_p  = (model_c && *model_c) ? path_t(model_c) : path_t(optarg_mo);
+    path_t fmt_p = fmt_c  ? path_t(fmt_c)  : path_t(PATHSTR("png"));
+
+    int ret = main_internal((int)backend,
+                            in_p,
+                            out_p,
+                            (int)scale,
+                            (int)tilesize,
+                            (int)color_type,
+                            (int)decensor_mode,
+                            mo_p,
+                            (int)jobs_load,
+                            (int)jobs_save,
+                            (int)verbose,
+                            fmt_p);
+
+    if (input_path && in_c) env->ReleaseStringUTFChars(input_path, in_c);
+    if (output_path && out_c) env->ReleaseStringUTFChars(output_path, out_c);
+    if (model_path && model_c) env->ReleaseStringUTFChars(model_path, model_c);
+    if (format && fmt_c) env->ReleaseStringUTFChars(format, fmt_c);
+    return ret;
+}
+#endif

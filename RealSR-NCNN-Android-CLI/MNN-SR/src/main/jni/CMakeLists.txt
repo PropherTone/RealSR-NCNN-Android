@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(mnnsr-ncnn)
+project(mnnsr)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
@@ -11,7 +11,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../CMake/libwebp.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../CMake/opencv.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../CMake/mnn.cmake)
 
-add_executable(${PROJECT_NAME} main.cpp mnnsr.cpp dcp.cpp)
+#add_executable(${PROJECT_NAME} main.cpp mnnsr.cpp dcp.cpp)
+add_library(${PROJECT_NAME} SHARED main.cpp mnnsr.cpp dcp.cpp)
 
 
 if (MSVC)  # Visual Studio
@@ -53,12 +54,38 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
 else ()
-    target_link_libraries(${PROJECT_NAME} webp MNN MNN_CL MNN_Vulkan ${OpenCV_LIBS})
+    find_library(cppshared c++_shared)
+
+    target_link_libraries(${PROJECT_NAME} webp MNN MNN_CL MNN_Vulkan ${OpenCV_LIBS} ${cppshared})
     
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
             ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/assets/realsr
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:${PROJECT_NAME}>
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/$<TARGET_FILE_NAME:${PROJECT_NAME}>
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN.so
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_CL.so
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_Vulkan.so
     )
 endif ()
 
