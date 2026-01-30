@@ -1,4 +1,4 @@
-package com.mnn.realsr
+package org.mnn.realsr
 
 class MnnSrNative {
 
