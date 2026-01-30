@@ -5,33 +5,19 @@ plugins {
 }
 
 android {
-    namespace = "org.mnn.realsr.android"
+    namespace = "com.mnn.realsr.android"
     compileSdk {
         version = release(36)
     }
-    ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "org.mnn.realsr.android"
+        applicationId = "com.mnn.realsr.android"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                arguments("-DANDROID_ARM_NEON=TRUE", "-DANDROID_STL=c++_shared")
-                abiFilters("arm64-v8a", "armeabi-v7a")
-                cppFlags("")
-            }
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path = file("../../RealSR-NCNN-Android-CLI/MNN-SR/src/main/jni/CMakeLists.txt")
-        }
     }
 
     buildTypes {
@@ -56,6 +42,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":MNN_SR"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RealSR-MNN-Android-GUI"
 include(":app")
- 
+include(":MNN_SR")

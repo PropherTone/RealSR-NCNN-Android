@@ -1,6 +1,7 @@
 package com.mnn.realsr.android
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mnn.realsr.MnnSrNative
 import com.mnn.realsr.android.ui.theme.RealSRMNNAndroidGUITheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,11 +26,14 @@ class MainActivity : ComponentActivity() {
             RealSRMNNAndroidGUITheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LaunchedEffect(Unit) {
-                        MnnSrNative().runDefaultJava(
-                            "/sdcard/DCIM/upscale/300.jpeg",
-                            "/sdcard/DCIM/test.png",
-                            "/sdcard/Download/llvm/ESRGAN-Nomos8kSC-x4.mnn"
-                        )
+                        launch(Dispatchers.IO) {
+                            val re = MnnSrNative().runDefault(
+                                inputPath = "/sdcard/DCIM/upscale/300.jpeg",
+                                outputPath = "/sdcard/DCIM/test.png",
+                                modelPath = "/sdcard/Download/llvm/ESRGAN-Nomos8kSC-x4.mnn"
+                            )
+                            Log.i("TAG", "onCreate: $re")
+                        }
                     }
                     Greeting(
                         name = "Android",

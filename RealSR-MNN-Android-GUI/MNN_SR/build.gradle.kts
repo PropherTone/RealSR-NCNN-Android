@@ -1,0 +1,52 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.mnn.realsr"
+    compileSdk {
+        version = release(36)
+    }
+    ndkVersion = "29.0.14206865"
+
+    defaultConfig {
+        minSdk = 24
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
+        externalNativeBuild {
+            cmake {
+                arguments("-DANDROID_ARM_NEON=TRUE", "-DANDROID_STL=c++_shared")
+                abiFilters("arm64-v8a", "armeabi-v7a")
+                cppFlags("")
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("../../RealSR-NCNN-Android-CLI/MNN-SR/src/main/jni/CMakeLists.txt")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+dependencies {
+}

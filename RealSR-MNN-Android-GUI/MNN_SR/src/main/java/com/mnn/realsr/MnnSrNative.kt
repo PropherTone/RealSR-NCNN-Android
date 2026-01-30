@@ -28,9 +28,9 @@ class MnnSrNative {
     fun runDefault(
         inputPath: String,
         outputPath: String,
+        modelPath: String,
         scale: Int = 4,
         tileSize: Int = 0,
-        modelPath: String,
         //gpu device to use (default=0) can be 0,1,2 for multi-gpu, -1 use cpu
         gpuIds: IntArray? = intArrayOf(-1),
         jobsSave: Int = 1,
