@@ -1,4 +1,4 @@
-package org.mnn.realsr.android.ui.theme
+package com.mnn.realsr.android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

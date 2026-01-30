@@ -30,7 +30,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path = file("../RealSR-NCNN-Android-CLI/MNN-SR/src/main/jni/CMakeLists.txt")
+            path = file("../../RealSR-NCNN-Android-CLI/MNN-SR/src/main/jni/CMakeLists.txt")
         }
     }
 
