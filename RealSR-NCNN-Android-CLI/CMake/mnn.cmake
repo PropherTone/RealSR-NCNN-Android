@@ -1,5 +1,5 @@
 
-if (MSVC)  # Visual Studio
+if (MSVC)
 
     # 设置目标属性，指定 MNN 库的路径
     set(mnn_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../3rdparty/mnn_windows_x64_cpu_opencl)
@@ -17,6 +17,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "find mnn: ${MNN_LIB}")
     set(ncnn_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../3rdparty/ncnn-ubuntu-shared)
 else()
+    if (TARGET MNN)
+        set(mnn_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../3rdparty/MNN)
+        include_directories(${mnn_DIR}/include)
+    else()
 
     # 设置目标属性，指定 MNN 库的路径
     set(mnn_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../3rdparty/mnn_android)
@@ -25,21 +29,22 @@ else()
     #include_directories(${mnn_DIR}/${ANDROID_ABI}/include/MNN)
     find_library(MNN_LIB mnn HINTS "${mnn_DIR}/${TARGET_ARCH}")
 
-    add_library(MNN SHARED IMPORTED)
-    set_target_properties(MNN PROPERTIES IMPORTED_LOCATION
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so)
+        add_library(MNN SHARED IMPORTED)
+        set_target_properties(MNN PROPERTIES IMPORTED_LOCATION
+                ${mnn_DIR}/${ANDROID_ABI}/libMNN.so)
 
-    add_library(c++_shared SHARED IMPORTED)
-    set_target_properties(c++_shared PROPERTIES IMPORTED_LOCATION
-            ${mnn_DIR}/${ANDROID_ABI}/libc++_shared.so)
+        add_library(c++_shared SHARED IMPORTED)
+        set_target_properties(c++_shared PROPERTIES IMPORTED_LOCATION
+                ${mnn_DIR}/${ANDROID_ABI}/libc++_shared.so)
 
-    add_library(MNN_CL SHARED IMPORTED)
-    set_target_properties(MNN_CL PROPERTIES IMPORTED_LOCATION
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN_CL.so)
+        add_library(MNN_CL SHARED IMPORTED)
+        set_target_properties(MNN_CL PROPERTIES IMPORTED_LOCATION
+                ${mnn_DIR}/${ANDROID_ABI}/libMNN_CL.so)
 
-    add_library(MNN_Vulkan SHARED IMPORTED)
-    set_target_properties(MNN_Vulkan PROPERTIES IMPORTED_LOCATION
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN_Vulkan.so)
+        add_library(MNN_Vulkan SHARED IMPORTED)
+        set_target_properties(MNN_Vulkan PROPERTIES IMPORTED_LOCATION
+                ${mnn_DIR}/${ANDROID_ABI}/libMNN_Vulkan.so)
+    endif()
 endif ()
 
 

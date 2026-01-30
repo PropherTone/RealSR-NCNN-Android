@@ -17,7 +17,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
             cmake {
-                arguments("-DANDROID_ARM_NEON=TRUE", "-DANDROID_STL=c++_shared")
+                arguments("-DANDROID_ARM_NEON=TRUE", "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_shared", "-DMNN_JNI=TRUE", "-DMNN_OPENCL=true", "-DMNN_OPENGL=true","-DMNN_VULKAN=true")
                 abiFilters("arm64-v8a", "armeabi-v7a")
                 cppFlags("")
             }
@@ -26,7 +26,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path = file("../../RealSR-NCNN-Android-CLI/MNN-SR/src/main/jni/CMakeLists.txt")
+            path = file("src/main/jni/CMakeLists.txt")
         }
     }
 
