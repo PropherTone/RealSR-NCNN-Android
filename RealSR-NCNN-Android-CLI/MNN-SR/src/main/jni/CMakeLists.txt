@@ -72,20 +72,26 @@ else ()
             $<TARGET_FILE:${PROJECT_NAME}>
             ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/$<TARGET_FILE_NAME:${PROJECT_NAME}>
     )
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
-            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN.so
-    )
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
-            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_CL.so
-    )
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${mnn_DIR}/${ANDROID_ABI}/libMNN.so
-            ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_Vulkan.so
-    )
+    if(TARGET MNN)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:MNN>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN.so
+        )
+    endif()
+    if(TARGET MNN_CL)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:MNN_CL>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_CL.so
+        )
+    endif()
+    if(TARGET MNN_Vulkan)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:MNN_Vulkan>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../RealSR-NCNN-Android-GUI/app/src/main/jniLibs/${ANDROID_ABI}/libMNN_Vulkan.so
+        )
+    endif()
 endif ()
 

@@ -17,7 +17,16 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
             cmake {
-                arguments("-DANDROID_ARM_NEON=TRUE", "-DANDROID_PLATFORM=android-21", "-DANDROID_STL=c++_shared", "-DMNN_JNI=TRUE", "-DMNN_OPENCL=true", "-DMNN_OPENGL=true","-DMNN_VULKAN=true")
+                arguments(
+                    "-DCMAKE_MAKE_PROGRAM=C:\\Users\\w\\AndroidStudioProjects\\RealSR-NCNN-Android\\RealSR-MNN-Android-GUI\\ninja.exe",
+                    "-DANDROID_ARM_NEON=TRUE",
+                    "-DANDROID_PLATFORM=android-21",
+                    "-DANDROID_STL=c++_shared",
+                    "-DMNN_JNI=TRUE",
+                    "-DMNN_OPENCL=true",
+                    "-DMNN_OPENGL=true",
+                    "-DMNN_VULKAN=true"
+                )
                 abiFilters("arm64-v8a", "armeabi-v7a")
                 cppFlags("")
             }
